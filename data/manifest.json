@@ -1,0 +1,432 @@
+{
+ "classes": [
+  "LOCA",
+  "LOCAC",
+  "SLBIC",
+  "SLBOC",
+  "SGATR",
+  "SGBTR",
+  "RW",
+  "RI",
+  "FLB",
+  "MD",
+  "LR",
+  "LLB"
+ ],
+ "channels": {
+  "P": {
+   "name": "RCS pressure",
+   "unit": "bar"
+  },
+  "LVPZ": {
+   "name": "Pressurizer level",
+   "unit": "%"
+  },
+  "LSGA": {
+   "name": "Steam generator A level",
+   "unit": ""
+  },
+  "LSGB": {
+   "name": "Steam generator B level",
+   "unit": ""
+  },
+  "PSGA": {
+   "name": "Steam generator A pressure",
+   "unit": "bar"
+  },
+  "PSGB": {
+   "name": "Steam generator B pressure",
+   "unit": "bar"
+  },
+  "WSTA": {
+   "name": "Steam flow A",
+   "unit": ""
+  },
+  "WSTB": {
+   "name": "Steam flow B",
+   "unit": ""
+  },
+  "WFWA": {
+   "name": "Feedwater flow A",
+   "unit": ""
+  },
+  "WFWB": {
+   "name": "Feedwater flow B",
+   "unit": ""
+  },
+  "TAVG": {
+   "name": "Average coolant temperature",
+   "unit": "\u00b0C"
+  },
+  "THA": {
+   "name": "Hot-leg temperature A",
+   "unit": "\u00b0C"
+  },
+  "THB": {
+   "name": "Hot-leg temperature B",
+   "unit": "\u00b0C"
+  },
+  "PWR": {
+   "name": "Reactor power",
+   "unit": "%"
+  },
+  "DNBR": {
+   "name": "DNBR (boiling-crisis margin)",
+   "unit": ""
+  },
+  "VOID": {
+   "name": "Core void fraction",
+   "unit": ""
+  },
+  "TPCT": {
+   "name": "Peak cladding temperature",
+   "unit": "\u00b0C"
+  }
+ },
+ "default_chart_channels": [
+  "P",
+  "LVPZ",
+  "LSGA",
+  "LSGB",
+  "PWR",
+  "DNBR"
+ ],
+ "default_setting": "t0100_realistic",
+ "settings": {
+  "t0100_realistic": {
+   "label": "Onset-aligned t0 = 100 s \u00b7 realistic instrumentation",
+   "t0": 100,
+   "vars": "realistic",
+   "f1": {
+    "30": 0.9607,
+    "60": 0.9674,
+    "120": 0.9685,
+    "300": 0.9596,
+    "600": 0.971
+   }
+  },
+  "t0100_all": {
+   "label": "Onset-aligned t0 = 100 s \u00b7 all 96 variables",
+   "t0": 100,
+   "vars": "all",
+   "f1": {
+    "30": 0.9891,
+    "60": 0.985,
+    "120": 0.989,
+    "300": 0.983,
+    "600": 0.9849
+   }
+  },
+  "t020_realistic": {
+   "label": "Handout t0 = 20 s \u00b7 realistic instrumentation",
+   "t0": 20,
+   "vars": "realistic",
+   "f1": {
+    "30": 0.1892,
+    "60": 0.1892,
+    "120": 0.9757,
+    "300": 0.9714,
+    "600": 0.9602
+   }
+  },
+  "t020_all": {
+   "label": "Handout t0 = 20 s \u00b7 all 96 variables",
+   "t0": 20,
+   "vars": "all",
+   "f1": {
+    "30": 0.1892,
+    "60": 0.1892,
+    "120": 0.9918,
+    "300": 0.9876,
+    "600": 0.9904
+   }
+  }
+ },
+ "runs": [
+  {
+   "id": "LOCA",
+   "class": "LOCA",
+   "severity": 51.0,
+   "file": "LOCA/51.csv",
+   "data": "run_LOCA.json",
+   "break": {
+    "kind": "rcs",
+    "loop": null
+   }
+  },
+  {
+   "id": "LOCAC",
+   "class": "LOCAC",
+   "severity": 51.0,
+   "file": "LOCAC/51.csv",
+   "data": "run_LOCAC.json",
+   "break": {
+    "kind": "rcs",
+    "loop": null
+   }
+  },
+  {
+   "id": "SLBIC",
+   "class": "SLBIC",
+   "severity": 51.0,
+   "file": "SLBIC/51.csv",
+   "data": "run_SLBIC.json",
+   "break": {
+    "kind": "steam",
+    "loop": "B",
+    "devA": 266.99,
+    "devB": 291.18
+   }
+  },
+  {
+   "id": "SLBOC",
+   "class": "SLBOC",
+   "severity": 51.0,
+   "file": "SLBOC/51.csv",
+   "data": "run_SLBOC.json",
+   "break": {
+    "kind": "steamout",
+    "loop": "B"
+   }
+  },
+  {
+   "id": "SGATR",
+   "class": "SGATR",
+   "severity": 51.0,
+   "file": "SGATR/51.csv",
+   "data": "run_SGATR.json",
+   "break": {
+    "kind": "sg",
+    "loop": "A"
+   }
+  },
+  {
+   "id": "SGBTR",
+   "class": "SGBTR",
+   "severity": 56.0,
+   "file": "SGBTR/56.csv",
+   "data": "run_SGBTR.json",
+   "break": {
+    "kind": "sg",
+    "loop": "B"
+   }
+  },
+  {
+   "id": "RW",
+   "class": "RW",
+   "severity": 51.0,
+   "file": "RW/51.csv",
+   "data": "run_RW.json",
+   "break": {
+    "kind": "core",
+    "loop": null
+   }
+  },
+  {
+   "id": "RI",
+   "class": "RI",
+   "severity": -40.0,
+   "file": "RI/-40.csv",
+   "data": "run_RI.json",
+   "break": {
+    "kind": "core",
+    "loop": null
+   }
+  },
+  {
+   "id": "FLB",
+   "class": "FLB",
+   "severity": 51.0,
+   "file": "FLB/51.csv",
+   "data": "run_FLB.json",
+   "break": {
+    "kind": "feed",
+    "loop": "B",
+    "devA": 271.5,
+    "devB": 543.21
+   }
+  },
+  {
+   "id": "MD",
+   "class": "MD",
+   "severity": 51.0,
+   "file": "MD/51.csv",
+   "data": "run_MD.json",
+   "break": {
+    "kind": "none",
+    "loop": null
+   }
+  },
+  {
+   "id": "LR",
+   "class": "LR",
+   "severity": 51.0,
+   "file": "LR/51.csv",
+   "data": "run_LR.json",
+   "break": {
+    "kind": "none",
+    "loop": null
+   }
+  },
+  {
+   "id": "LLB",
+   "class": "LLB",
+   "severity": 51.0,
+   "file": "LLB/51.csv",
+   "data": "run_LLB.json",
+   "break": {
+    "kind": "none",
+    "loop": null
+   }
+  }
+ ],
+ "models": {
+  "LogReg": {
+   "label": "Logistic regression",
+   "tag": "Logistic regression \u00b7 starter baseline",
+   "note": "starter baseline \u2014 per-variable last/mean/slope features, C = 1",
+   "f1": {
+    "t020_all": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.882,
+     "300": 0.8572,
+     "600": 0.8532
+    },
+    "t020_realistic": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9247,
+     "300": 0.8548,
+     "600": 0.8505
+    },
+    "t0100_all": {
+     "30": 0.8697,
+     "60": 0.865,
+     "120": 0.864,
+     "300": 0.8532,
+     "600": 0.8575
+    },
+    "t0100_realistic": {
+     "30": 0.8948,
+     "60": 0.8606,
+     "120": 0.8574,
+     "300": 0.8511,
+     "600": 0.8536
+    }
+   }
+  },
+  "LogReg+": {
+   "label": "Logistic regression +",
+   "tag": "Logistic regression + \u00b7 tuned, log10 features",
+   "note": "same features after log10 compression of the heavy-tailed channels, C tuned",
+   "f1": {
+    "t020_all": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9796,
+     "300": 0.9639,
+     "600": 0.9709
+    },
+    "t020_realistic": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9678,
+     "300": 0.9631,
+     "600": 0.9585
+    },
+    "t0100_all": {
+     "30": 0.975,
+     "60": 0.9794,
+     "120": 0.9707,
+     "300": 0.9545,
+     "600": 0.9675
+    },
+    "t0100_realistic": {
+     "30": 0.9715,
+     "60": 0.9675,
+     "120": 0.9677,
+     "300": 0.9577,
+     "600": 0.9593
+    }
+   }
+  },
+  "CNN": {
+   "label": "1D CNN",
+   "tag": "1D CNN \u00b7 3-seed average",
+   "note": "probabilities averaged over seeds 0/1/2",
+   "f1": {
+    "t020_all": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9918,
+     "300": 0.9876,
+     "600": 0.9904
+    },
+    "t020_realistic": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9757,
+     "300": 0.9714,
+     "600": 0.9602
+    },
+    "t0100_all": {
+     "30": 0.9891,
+     "60": 0.985,
+     "120": 0.989,
+     "300": 0.983,
+     "600": 0.9849
+    },
+    "t0100_realistic": {
+     "30": 0.9607,
+     "60": 0.9674,
+     "120": 0.9685,
+     "300": 0.9596,
+     "600": 0.971
+    }
+   }
+  },
+  "GRU": {
+   "label": "GRU",
+   "tag": "GRU \u00b7 3-seed average",
+   "note": "probabilities averaged over seeds 0/1/2",
+   "f1": {
+    "t020_all": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9904,
+     "300": 0.9626,
+     "600": 0.906
+    },
+    "t020_realistic": {
+     "30": 0.1892,
+     "60": 0.1892,
+     "120": 0.9151,
+     "300": 0.8911,
+     "600": 0.871
+    },
+    "t0100_all": {
+     "30": 0.985,
+     "60": 0.9849,
+     "120": 0.9847,
+     "300": 0.9803,
+     "600": 0.9063
+    },
+    "t0100_realistic": {
+     "30": 0.8812,
+     "60": 0.918,
+     "120": 0.9724,
+     "300": 0.9641,
+     "600": 0.8507
+    }
+   }
+  }
+ },
+ "model_order": [
+  "LogReg",
+  "LogReg+",
+  "CNN",
+  "GRU"
+ ],
+ "default_model": "CNN"
+}

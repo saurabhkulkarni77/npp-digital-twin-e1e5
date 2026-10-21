@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NPPAD Digital Twin — Task E (E1–E5)</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <div class="title-block">
+    <h1>NPPAD Digital Twin — Task E (E1–E5)</h1>
+    <p class="subtitle">NPPAD accident diagnosis &middot; PCTRAN pressurized-water reactor &middot; Built for the core notebook: E1 dataset, E2 classical baseline, E3 deep models, E4 early diagnosis, E5 realistic instrumentation.</p>
+  </div>
+  <div class="header-controls">
+    <label class="reveal-toggle"><input type="checkbox" id="revealToggle"> Reveal true accident</label>
+    <button id="vrButton" class="btn" disabled>Enter VR</button>
+  </div>
+</header>
+
+<nav id="runBar" aria-label="Choose a simulated run"></nav>
+
+<section id="modelsPanel" class="panel" aria-label="Models used in this notebook">
+  <h2>Models used in this notebook</h2>
+  <p class="model-note">All four classifiers of the core Task E notebook (E1&ndash;E5),
+    switchable here or in the Diagnosis panel &mdash; both controls drive the same
+    model switcher. Macro-F1 shown at the default setting: onset-aligned
+    t0 = 100 s &middot; realistic instrumentation, W = 60 s.</p>
+  <div class="model-cards">
+    <div class="model-card" data-model="LogReg">
+      <div class="model-card-head"><strong>Logistic regression</strong></div>
+      <p>Summary features + multinomial logistic regression (the E2 starter baseline).</p>
+      <div class="model-card-foot"><span class="model-f1">macro-F1 0.8606</span>
+        <button type="button" class="btn model-use" data-model="LogReg">Use this model</button></div>
+    </div>
+    <div class="model-card" data-model="LogReg+">
+      <div class="model-card-head"><strong>Logistic regression +</strong></div>
+      <p>Tuned logistic regression on log-scaled features (log10 compression of the heavy-tailed channels, C tuned).</p>
+      <div class="model-card-foot"><span class="model-f1">macro-F1 0.9675</span>
+        <button type="button" class="btn model-use" data-model="LogReg+">Use this model</button></div>
+    </div>
+    <div class="model-card active" data-model="CNN">
+      <div class="model-card-head"><strong>1D CNN</strong> <span class="model-default">default</span></div>
+      <p>1D convolutional network over the raw window, probabilities averaged over seeds 0/1/2.</p>
+      <div class="model-card-foot"><span class="model-f1">macro-F1 0.9674</span>
+        <button type="button" class="btn model-use" data-model="CNN">Use this model</button></div>
+    </div>
+    <div class="model-card" data-model="GRU">
+      <div class="model-card-head"><strong>GRU</strong></div>
+      <p>Gated recurrent unit network over the raw window, probabilities averaged over seeds 0/1/2.</p>
+      <div class="model-card-foot"><span class="model-f1">macro-F1 0.918</span>
+        <button type="button" class="btn model-use" data-model="GRU">Use this model</button></div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <section id="viewport">
+    <div id="sceneContainer"></div>
+    <div id="hud">
+      <div class="hud-row"><span>Sim time</span><strong id="hudTime">t = 0 s</strong></div>
+      <div class="hud-row"><span>Phase</span><strong id="hudPhase">Steady state</strong></div>
+      <div class="hud-row"><span>Diagnosis snapshot</span><strong id="hudW">W = &mdash;</strong></div>
+      <div class="hud-row"><span>Run</span><strong id="hudRun">&mdash;</strong></div>
+    </div>
+    <div id="onsetToast">Plant response begins (~110 s after the 20 s insertion)</div>
+  </section>
+
+  <aside id="sidePanel">
+    <div class="panel">
+      <h2>Diagnosis <span class="model-tag" id="modelTag">1D CNN &middot; 3-seed average</span></h2>
+      <label class="setting-label">Model
+        <select id="modelSel"></select>
+      </label>
+      <label class="setting-label">Setting
+        <select id="settingSel"></select>
+      </label>
+      <p class="model-note" id="settingLabel"></p>
+      <p class="model-note" id="f1Line"></p>
+      <p class="model-note">Diagnosis: all four classifiers of this notebook,
+        switchable above &mdash; Logistic regression (the starter baseline),
+        Logistic regression + (log10-compressed features, tuned C), the 1D CNN
+        and the GRU (CNN/GRU probabilities averaged over seeds 0/1/2). Each
+        reports one prediction per evaluated window (W = 30/60/120/300/600 s),
+        shown as snapshots. The default setting aligns windows to the real
+        onset (t0 = 100 s: in the data the plant responds only from
+        &asymp;110 s). The handout settings (t0 = 20 s) sit at the information
+        ceiling (macro-F1 0.189) for W &le; 60 s for every model. Main
+        prediction file of the notebook (CNN, seed-averaged probabilities,
+        t0 = 100 s, realistic, W = 60 s): macro-F1 0.972.</p>
+      <div id="diagBody">
+        <div id="diagIdle" class="diag-idle">Collecting the first diagnosis window.</div>
+        <div id="diagBars" class="hidden">
+          <div class="bar-row" id="barRow0"><span class="bar-label"></span>
+            <div class="bar-track"><div class="bar-fill"></div></div><span class="bar-val"></span></div>
+          <div class="bar-row" id="barRow1"><span class="bar-label"></span>
+            <div class="bar-track"><div class="bar-fill"></div></div><span class="bar-val"></span></div>
+          <div class="bar-row" id="barRow2"><span class="bar-label"></span>
+            <div class="bar-track"><div class="bar-fill"></div></div><span class="bar-val"></span></div>
+          <p class="diag-note" id="snapNote"></p>
+        </div>
+      </div>
+      <div id="truthBox" class="hidden">
+        <div class="hud-row"><span>True accident</span><strong id="truthLabel">&mdash;</strong></div>
+        <div class="hud-row"><span>Model verdict</span><strong id="verdictLabel">&mdash;</strong></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Plant state</h2>
+      <div class="tiles">
+        <div class="tile"><span>RCS pressure</span><strong id="tileP">&mdash;</strong><em>bar</em></div>
+        <div class="tile"><span>Pressurizer level</span><strong id="tileLVPZ">&mdash;</strong><em>%</em></div>
+        <div class="tile"><span>Reactor power</span><strong id="tilePWR">&mdash;</strong><em>%</em></div>
+        <div class="tile"><span>DNBR margin</span><strong id="tileDNBR">&mdash;</strong><em>ratio</em></div>
+        <div class="tile"><span>SG A level</span><strong id="tileLSGA">&mdash;</strong><em>raw</em></div>
+        <div class="tile"><span>SG B level</span><strong id="tileLSGB">&mdash;</strong><em>raw</em></div>
+      </div>
+      <p class="diag-note">The 3D plant reacts to these same channels: SG and
+        pressurizer water levels, core heat, rod position, and the flashing
+        break marker are all driven by the simulated data, frame by frame.</p>
+    </div>
+  </aside>
+</main>
+
+<section id="bottomPanel">
+  <div id="transport">
+    <button id="playBtn" class="btn primary">&#10074;&#10074;</button>
+    <button id="restartBtn" class="btn" title="Back to t = 0">&#8634;</button>
+    <label class="speed-label">Speed
+      <select id="speedSel">
+        <option value="0.5">0.5&times;</option>
+        <option value="1" selected>1&times;</option>
+        <option value="2">2&times;</option>
+        <option value="4">4&times;</option>
+      </select>
+    </label>
+    <div id="scrubWrap">
+      <input type="range" id="scrub" min="0" max="70" step="0.01" value="0">
+      <div id="onsetTick" title="Accident inserted (t = 20 s); plant response from ~110 s"></div>
+    </div>
+    <span id="clockLabel">t = 0 s</span>
+  </div>
+  <div id="chartArea">
+    <div id="chartChips"></div>
+    <canvas id="chart"></canvas>
+  </div>
+</section>
+
+<footer>
+  <p>Diagnosis: the <strong>core Task E notebook's</strong> own four
+     classifiers &mdash; logistic regression, logistic regression +, 1D CNN and GRU
+     &mdash; from the notebook whose analysis aligns the diagnosis windows to the plant's real
+     response onset (t0 = 100 s) after showing that handout windows (t0 = 20 s)
+     cannot beat macro-F1 0.189 at W &le; 60 s. Probabilities are the notebook's own
+     saved outputs (CNN/GRU averaged over seeds 0/1/2); the twin adds nothing of its
+     own &mdash; no other models, no conformal sets. Runs shown are held-out
+     <strong>test</strong> runs, one per accident class (median severity), the same
+     runs the notebook's prediction files score. Fully offline: no external requests.</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+<script>
+// "Models used in this notebook" panel <-> Diagnosis panel switcher sync.
+// The panel buttons drive the same #modelSel the app uses (its onchange
+// handler calls setModel); the highlight follows #modelSel changes from
+// either control.
+(function () {
+  var sel = document.getElementById('modelSel');
+  function highlight(key) {
+    document.querySelectorAll('#modelsPanel .model-card').forEach(function (card) {
+      card.classList.toggle('active', card.getAttribute('data-model') === key);
+    });
+  }
+  document.querySelectorAll('#modelsPanel .model-use').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-model');
+      if (!sel) return;
+      sel.value = key;
+      sel.dispatchEvent(new Event('change'));
+      highlight(key);
+    });
+  });
+  if (sel) sel.addEventListener('change', function () { highlight(sel.value); });
+})();
+</script>
+</body>
+</html>
